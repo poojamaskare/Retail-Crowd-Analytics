@@ -10,7 +10,7 @@ Transform existing CCTV infrastructure into a physical-world business intelligen
 
 ---
 
-## 🎯 Project Vision & Business Intelligence
+## Project Vision & Business Intelligence
 
 In retail environments, understanding spatial utilization is the key to maximizing revenue. This project turns passive CCTV camera video feeds into actionable insights:
 * **Foot Traffic Measurement**: Count cumulative unique shoppers and monitor real-time occupant presence.
@@ -20,7 +20,7 @@ In retail environments, understanding spatial utilization is the key to maximizi
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
 ### 1. High-Fidelity Shopper Tracking
 * Powered by **YOLOv8** Object Detection coupled with a customized **ByteTrack** tracking algorithm.
@@ -29,9 +29,9 @@ In retail environments, understanding spatial utilization is the key to maximizi
 ### 2. Multi-Dimensional Visual Analytics
 * **Movement Heatmap (`heatmap_*.png`)**: Generates smooth Gaussian-blurred density clouds overlaid on the camera's reference frame to highlight dwell patterns and peak traffic regions.
 * **Spatial Zone Classification (`flow_*.png`)**: Segments the area into a 6x6 spatial grid, classifying zones dynamically:
-  * 🟩 **Dominant Paths**: Extremely high traffic and movement pathways.
-  * 🟦 **Underutilized Zones**: Light foot traffic with potential for optimization.
-  * 🟥 **Dead Areas**: Zero foot traffic recorded during the analysis window.
+  * **Dominant Paths**: Extremely high traffic and movement pathways.
+  * **Underutilized Zones**: Light foot traffic with potential for optimization.
+  * **Dead Areas**: Zero foot traffic recorded during the analysis window.
 * **Visual Attention & Gaze Hotspots (`attention_*.png`)**: Projects gaze lines based on tracking velocity. Fast-moving shoppers project attention forward along their path, while stationary/dwelling shoppers project a circular attention field. Locates and ranks the Top 3 attention peaks.
 * **Annotated Video Output (`output_*.mp4`)**: Exports full-resolution video showing tracking boxes, active shopper tags, movement trails, custom zone overlays, and a HUD status display.
 
@@ -41,7 +41,7 @@ In retail environments, understanding spatial utilization is the key to maximizi
 
 ---
 
-## 💻 Hardware Acceleration Engine
+## Hardware Acceleration Engine
 
 The vision pipeline features automatic hardware discovery. It searches and compiles optimized models based on your systems:
 1. **GPU (NVIDIA CUDA / Apple Silicon MPS)**: Accelerates inference via PyTorch hardware backends.
@@ -51,7 +51,7 @@ The vision pipeline features automatic hardware discovery. It searches and compi
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 ├── app.py                # Premium Streamlit Multi-Video Dashboard Web Application
@@ -64,7 +64,7 @@ The vision pipeline features automatic hardware discovery. It searches and compi
 
 ---
 
-## ⚙️ Setup & Installation
+## Setup & Installation
 
 ### 1. Clone the Repository
 ```bash
@@ -90,7 +90,7 @@ pip install -r requirements.txt
 
 ---
 
-## 📊 How to Run the Applications
+## How to Run the Applications
 
 The project includes two interfaces: an interactive web dashboard and a command-line script.
 
@@ -119,4 +119,34 @@ For batch processing, cron automation, or server runs, use `pipeline.py`.
 python pipeline.py --input path/to/cctv_footage.mp4
 
 # Run with customized confidence thresholds, frame skipping, and floor/horizontal zones
-python pipeline.py --input cctv_1.mp4,cctv_2.mp4 --confidence 0.25 --skip 2 --zones horizontal --device gpp
+python pipeline.py --input cctv_1.mp4,cctv_2.mp4 --confidence 0.25 --skip 2 --zones horizontal --device gpu
+```
+
+#### CLI Command Arguments:
+| Argument | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `--input` | `str` | `"0"` | Path to video file(s) (comma-separated for batch runs) or webcam index (e.g., `0`). |
+| `--model` | `str` | `"yolov8n.pt"` | YOLOv8 model file version (`yolov8n.pt`, `yolov8s.pt`, etc.). |
+| `--confidence` | `float`| `0.3` | Object detection confidence threshold. |
+| `--tracker` | `str` | `"bytetrack.yaml"`| Path to tracking configuration. Automatically uses `custom_tracker.yaml` if found. |
+| `--zones` | `str` | `"vertical"` | Zone division mode: `vertical`, `horizontal`, or `disabled`. |
+| `--device` | `str` | `"gpu"` | Acceleration target: `cpu`, `gpu`, or `npu`. |
+| `--skip` | `int` | `1` | Frame skipping interval (e.g., `2` processes every second frame). |
+
+---
+
+## Tracker Tuning (custom_tracker.yaml)
+
+To capture tiny, distant shoppers in wide-angle CCTV atrium camera views, the default tracking parameters have been tuned in `custom_tracker.yaml`:
+* **`track_high_thresh`**: Lowered to `0.10` to maintain shopper tracking lines when they are temporarily obscured or blend into the background.
+* **`track_low_thresh`**: Set to `0.05` to capture low-contrast, distant shapes.
+* **`new_track_thresh`**: Lowered to `0.12` to initiate tracking trails early.
+* **`track_buffer`**: Set to `30` frames to retain IDs during brief occlusions behind pillars or displays.
+
+---
+
+## License & Acknowledgments
+
+* Powered by [Ultralytics YOLOv8](https://github.com/ultralytics/ultralytics) for real-time object detection.
+* Acceleration powered by the [Intel OpenVINO Toolkit](https://github.com/openvinotoolkit/openvino).
+* Created as a Proof of Concept (POC) for Retail Spatial Analytics.
