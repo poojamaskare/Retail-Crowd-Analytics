@@ -1,0 +1,8 @@
+# Custom ByteTrack settings for high sensitivity tracking
+tracker_type: bytetrack
+track_high_thresh: 0.10  # Lowered to match conf_threshold
+track_low_thresh: 0.05
+new_track_thresh: 0.12   # Initiate new tracks at lower confidence
+track_buffer: 30
+match_thresh: 0.8
+fuse_score: true

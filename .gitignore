@@ -1,0 +1,52 @@
+# Python caches and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyInstaller / packaging
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nosenv/
+.pytest_cache/
+vulture_failures.txt
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Streamlit configurations
+.streamlit/
+
+# Large Model Weights (YOLOv8)
+*.pt
+
+# OpenVINO Compiled Models
+*_openvino_model/
+
+# Pipeline Static Visual & Video Outputs
+output_*.mp4
+heatmap_*.png
+flow_*.png
+attention_*.png
+*.mp4
+*.png
+*.avi
+*.mov
+*.webm
+
+# System Files
+.DS_Store
+Thumbs.db

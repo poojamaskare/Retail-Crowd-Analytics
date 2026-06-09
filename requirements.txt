@@ -1,0 +1,6 @@
+ultralytics>=8.0.0
+opencv-python>=4.8.0
+numpy>=1.23.0
+matplotlib>=3.7.0
+streamlit>=1.25.0
+openvino>=2023.0.0
