@@ -15,8 +15,7 @@ Transform existing CCTV infrastructure into a physical-world business intelligen
 In retail environments, understanding spatial utilization is the key to maximizing revenue. This project turns passive CCTV camera video feeds into actionable insights:
 * **Foot Traffic Measurement**: Count cumulative unique shoppers and monitor real-time occupant presence.
 * **Spatial Optimization**: Categorize physical zones into high-traffic (Dominant), underutilized, or dead space to optimize mall rents and store layouts.
-* **Visual Attention Mapping**: Trace shopper orientation and project eye-level gaze attention areas to evaluate storefront and advertisement visibility.
-* **Operational Intelligence**: Enable operators to detect bottlenecks, optimize floor layouts, and place high-value ads in scientifically proven hotspots.
+* **Operational Intelligence**: Enable operators to detect bottlenecks, optimize floor layouts, and place high-value ads along the busiest paths.
 
 ---
 
@@ -24,7 +23,7 @@ In retail environments, understanding spatial utilization is the key to maximizi
 
 ### 1. High-Fidelity Shopper Tracking
 * Powered by **YOLOv8** Object Detection coupled with a customized **ByteTrack** tracking algorithm.
-* Optimized tracking sensitivity via [custom_tracker.yaml](file:///c:/Users/POOJA/Documents/vissioning/custom_tracker.yaml) for reliable long-range tracking, even in crowded or low-resolution atrium environments.
+* Optimized tracking sensitivity via [custom_tracker.yaml](custom_tracker.yaml) for reliable long-range tracking, even in crowded or low-resolution atrium environments.
 
 ### 2. Multi-Dimensional Visual Analytics
 * **Movement Heatmap (`heatmap_*.png`)**: Generates smooth Gaussian-blurred density clouds overlaid on the camera's reference frame to highlight dwell patterns and peak traffic regions.
@@ -32,12 +31,7 @@ In retail environments, understanding spatial utilization is the key to maximizi
   * **Dominant Paths**: Extremely high traffic and movement pathways.
   * **Underutilized Zones**: Light foot traffic with potential for optimization.
   * **Dead Areas**: Zero foot traffic recorded during the analysis window.
-* **Visual Attention & Gaze Hotspots (`attention_*.png`)**: Projects gaze lines based on tracking velocity. Fast-moving shoppers project attention forward along their path, while stationary/dwelling shoppers project a circular attention field. Locates and ranks the Top 3 attention peaks.
-* **Annotated Video Output (`output_*.mp4`)**: Exports full-resolution video showing tracking boxes, active shopper tags, movement trails, custom zone overlays, and a HUD status display.
-
-### 3. Dynamic Zone Segmentation
-* **Vertical Segmentation**: Splits the scene into Left, Center, and Right zones to compare storefront entry paths.
-* **Horizontal Segmentation (Multi-Floor View)**: Auto-detects physical floor walkways/balconies in shopping mall atriums using shopper density projection histograms, tracking multi-floor counts simultaneously.
+* **Annotated Video Output (`output_*.mp4`)**: Exports full-resolution video showing tracking boxes, active shopper tags, movement trails, and a HUD status display.
 
 ---
 
@@ -104,7 +98,6 @@ streamlit run app.py
 
 * **Live Dashboard Controls**:
   * **Processing Speed (Frame Skipping)**: Balance tracking resolution with performance.
-  * **Zone Division Mode**: Switch between Vertical, Horizontal (Multi-Floor), and Disabled.
   * **Target Hardware Device**: Choose GPU, Intel NPU, or CPU.
   * **Video Timeline Ranges**: Crop analysis start and end times dynamically inside the sidebar.
 
@@ -118,8 +111,8 @@ For batch processing, cron automation, or server runs, use `pipeline.py`.
 # Basic running with default settings on a video file
 python pipeline.py --input path/to/cctv_footage.mp4
 
-# Run with customized confidence thresholds, frame skipping, and floor/horizontal zones
-python pipeline.py --input cctv_1.mp4,cctv_2.mp4 --confidence 0.25 --skip 2 --zones horizontal --device gpu
+# Run with customized confidence thresholds and frame skipping
+python pipeline.py --input cctv_1.mp4,cctv_2.mp4 --confidence 0.25 --skip 2 --device gpu
 ```
 
 #### CLI Command Arguments:
@@ -129,7 +122,6 @@ python pipeline.py --input cctv_1.mp4,cctv_2.mp4 --confidence 0.25 --skip 2 --zo
 | `--model` | `str` | `"yolov8n.pt"` | YOLOv8 model file version (`yolov8n.pt`, `yolov8s.pt`, etc.). |
 | `--confidence` | `float`| `0.3` | Object detection confidence threshold. |
 | `--tracker` | `str` | `"bytetrack.yaml"`| Path to tracking configuration. Automatically uses `custom_tracker.yaml` if found. |
-| `--zones` | `str` | `"vertical"` | Zone division mode: `vertical`, `horizontal`, or `disabled`. |
 | `--device` | `str` | `"gpu"` | Acceleration target: `cpu`, `gpu`, or `npu`. |
 | `--skip` | `int` | `1` | Frame skipping interval (e.g., `2` processes every second frame). |
 
