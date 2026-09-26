@@ -551,9 +551,7 @@ def main():
 
                     if show_preview:
                         # Convert to RGB for Streamlit rendering
-                        # Send a smaller preview frame; full-res frames are slow to stream from a cloud server
-                        preview = cv2.resize(frame, (960, int(orig_height * 960 / orig_width)), interpolation=cv2.INTER_AREA) if orig_width > 960 else frame
-                        frame_rgb = cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)
+                        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                         video_placeholder.image(frame_rgb, channels="RGB", width="stretch")
 
                         # Update KPI metrics
