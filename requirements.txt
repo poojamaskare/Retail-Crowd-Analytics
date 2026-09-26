@@ -2,6 +2,7 @@
 torch
 torchvision
 ultralytics>=8.0.0
+lap>=0.5.12
 opencv-python-headless>=4.8.0
 numpy>=1.23.0
 streamlit>=1.40.0
