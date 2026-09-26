@@ -314,6 +314,22 @@ def main():
         blended_heatmap = reference_frame.copy()
         blended_heatmap[mask] = cv2.addWeighted(reference_frame, 0.4, heatmap_color, 0.6, 0)[mask]
 
+        # Mark the single busiest spot on the heatmap
+        if np.max(heatmap_blur) > 0:
+            _, _, _, (px, py) = cv2.minMaxLoc(heatmap_blur)
+            peak_scale = max(0.5, (width / 1920.0) * 0.7)
+            peak_thick = max(1, int(width / 1920.0 * 2))
+            radius = max(25, int(width / 1920.0 * 45))
+            cv2.circle(blended_heatmap, (px, py), radius, (0, 0, 255), peak_thick, cv2.LINE_AA)
+            cv2.circle(blended_heatmap, (px, py), max(3, radius // 10), (0, 0, 255), -1)
+            label_text = "PEAK CONGESTION"
+            (w, h), _ = cv2.getTextSize(label_text, cv2.FONT_HERSHEY_SIMPLEX, peak_scale, peak_thick)
+            # Keep the label inside the frame
+            tx = min(max(px - w // 2, 8), width - w - 8)
+            ty = max(py - max(30, int(height * 0.04)), h + 8)
+            cv2.rectangle(blended_heatmap, (tx - 8, ty - h - 6), (tx + w + 8, ty + 6), (0, 0, 255), -1)
+            cv2.putText(blended_heatmap, label_text, (tx, ty), cv2.FONT_HERSHEY_SIMPLEX, peak_scale, (255, 255, 255), peak_thick, cv2.LINE_AA)
+
         # ---------------------------------------------
         # SPATIAL GRID CLASSIFICATION ENGINE
         # ---------------------------------------------
