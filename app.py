@@ -2,6 +2,7 @@ import streamlit as st
 import cv2
 import numpy as np
 import tempfile
+import base64
 import time
 import os
 import warnings
@@ -431,6 +432,7 @@ def main():
                 cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
                 frame_count = start_frame
                 processed_frame_count = 0
+                last_preview_time = 0.0
                 frames_to_process = end_frame - start_frame
 
                 while cap.isOpened():
@@ -549,10 +551,15 @@ def main():
                     cv2.putText(frame, f"TOTAL COUNTED: {len(unique_visitors)}", (25, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
                     cv2.putText(frame, f"CURRENT IN VIEW: {len(current_active_ids)}", (25, 85), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (148, 163, 184), 1, cv2.LINE_AA)
 
-                    if show_preview:
-                        # Convert to RGB for Streamlit rendering
-                        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                        video_placeholder.image(frame_rgb, channels="RGB", width="stretch")
+                    # ponytail: preview capped at ~4 fps, 960px, JPEG q60 (~60 KB) so it fits a slow link; raise if bandwidth allows
+                    if show_preview and time.time() - last_preview_time >= 0.25:
+                        last_preview_time = time.time()
+                        # Send the frame inline as a JPEG data URI. A plain st.image(array) makes the browser
+                        # download each frame separately; from a remote server the next frame cancels that
+                        # download before it finishes, so the preview never updates (only works on localhost).
+                        preview = frame if orig_width <= 960 else cv2.resize(frame, (960, int(orig_height * 960 / orig_width)), interpolation=cv2.INTER_AREA)
+                        _, jpg = cv2.imencode(".jpg", preview, [cv2.IMWRITE_JPEG_QUALITY, 60])
+                        video_placeholder.markdown(f'<img src="data:image/jpeg;base64,{base64.b64encode(jpg).decode()}" style="width:100%;border-radius:4px">', unsafe_allow_html=True)
 
                         # Update KPI metrics
                         metric_total.metric("Total People Tracked", str(len(unique_visitors)))
